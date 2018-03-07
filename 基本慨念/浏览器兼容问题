@@ -1,0 +1,102 @@
+1.div的垂直居中问题： vertical-align:middle;
+将行距增加到和整个DIV一样高： line-height:200px; 然后插入文字，就垂直居中了。
+缺点是要控制内容不要换行 。
+2. margin加倍的问题
+设置为float的div在ie下设置的margin会加倍。这是一个ie6都存在的bug。
+解决方案：在这个div里面加上 display:inline;
+例如： <div id="imfloat"> 相应的css为 #imfloat{ float:left; margin:5px;/*IE下理解为10px*/ display:inline;/*IE下再理解为5px*/}[2] 
+3. 浮动ie产生的双倍距离
+#box{ float:left; width:100px; margin:0 0 0 100px; /*这种情况之下IE会产生200px的距离, */ display:inline; /*使浮动忽略*/}
+这里细说一下block与inline两个元素：
+block元素的特点：总是在新行上开始，高度、宽度、行高、边距都可以控制(块元素)；
+Inline 元素的特点：和其他元素在同一行上，不可控制(内嵌元素)。
+4. IE与宽度和高度的问题
+IE 不认得min-这个定义，但实际上它把正常的width和height当作有min的情况来使。这样问题就大了，如果只用宽度和高度，正常的浏览器里这两个值就不会变，如果只用min-width和min-height的话，IE下面根本等于没有设置宽度和高度。 比如要设置背景图片，这个宽度是比较重要的。
+要解决这个问题，可以这样：
+#box{ width: 80px; height: 35px;}
+html>body #box{ width: auto; height: auto; min-width: 80px; min-height: 35px;}
+5. 页面的最小宽度
+min -width是个非常方便的CSS命令，它可以指定元素最小也不能小于某个宽度，这样就能保证排版一直正确。
+但IE不认得这个，而它实际上把width当做最小宽度来使。为了让这一命令在IE上也能用，可以把一个<div> 放到 <body> 标签下，然后为div指定一个类，然后CSS这样设计：
+#container{ min-width: 600px; width:expression(document.body.clientWidth < 600? "600px": "auto" );}
+第一个min-width是正常的；但第2行的width使用了Javascript，这只有IE才认得，这也会让你的HTML文档不太正规。它实际上通过Javascript的判断来实现最小宽度。
+6.DIV浮动IE文本产生3象素的bug 左边对象浮动，右边采用外补丁的左边距来定位，右边对象内的文本会离左边有3px的间距.
+例：
+<style type="text/css">
+#box{ float:left; width:800px;background-color: #000066;//可以优化为#006;}
+#left{ float:left; width:50%;background-color: #006600;//可以优化为#060;}
+#right{ width:50%;}
+*html #left{ margin-right:-3px; //这句是关键}
+</style>
+<div id="box">
+<div id="left">&nbsp;</div>
+<div id="right">&nbsp;</div>
+</div>
+7. IE捉迷藏的问题
+当div应用复杂的时候每个栏中又有一些链接，这个时候容易发生捉迷藏的问题。 有些内容显示不出来，当鼠标选择这个区域时发现内容确实在页面。
+解决办法：对#layout使用line-height属性或者给#layout使用固定高和宽。页面结构尽量简单。
+8.float的div闭合；清除浮动；自适应高度
+① 例1：
+<style type="text/css">
+.float_a,.float_b,.float_c { float:left; }
+.clear { clear:both; }
+</style>
+<div class="float_a">内容1</div>
+<div class="float_b">内容2</div>
+<div class="clear"></div>
+<div class="float_c">内容3</div>
+或者例2：
+<style type="text/css">
+.float_a,.float_b { float:left; }
+.fl_l { float:left;}
+.fl_r { float:right;}
+.clear:after{ content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+.clear { zoom: 1; }
+</style>
+<div class="clear aa">
+<div class="float_a fl_l"><div class="float_a fl_r">这是内容</div></div>
+</div>
+②作为外部 wrapper 的 div 不要定死高度，为了让高度能自动适应，要在wrapper里面加上overflow:hidden; 当包含float的 box的时候，高度自动适应在IE下无效，这时候应该触发IE的layout私有属性(万恶的IE啊！)用zoom:1;可以做到，这样就达到了兼容。
+例如某一个wrapper如下定义： .colwrapper{ overflow:hidden; zoom:1; margin:5px auto;}
+11.高度不适应
+高度不适应是当内层对象的高度发生变化时外层高度不能自动进行调节，特别是当内层对象使用margin 或padding 时。
+例：
+<style type="text/css">
+#box {background-color:#eee; }
+#box p {margin:20px 0; text-align:center;//原样式margin-top:20px; margin-bottom:20px; }
+</style>
+<div id="box">
+<p>p对象中的内容</p>
+</div>
+解决方法：在P对象上下各加2个空的div对象CSS代码：.1{height:0px;overflow:hidden;}或者为div加上 border属性。
+12 .IE6下为什么图片下有空隙产生
+解决这个BUG的方法也有很多，可以是改变html的排版，或者设置img 为display:block 或者设置vertical-align 属性为 vertical-align:top | bottom |middle |text-bottom 都可以解决。
+13.如何对齐文本与文本输入框
+加上 vertical-align:middle;
+<style type="text/css">
+<!-- input { width:200px; height:30px; border:1px solid red; vertical-align:middle;
+//垂直方向样式是重点！} -->
+</style>
+14.web标准中定义id与class有什么区别吗
+一、web标准中是不容许重复id的，比如 div id="aa" 不容许重复2次，而class 定义的是类，理论上可以无限重复，这样需要多次引用的定义便可以使用他；
+二、属性的优先级问题 id 的优先级要高于class，看上面的例子三.方便JS等客户端脚本，如果在页面中要对某个对象进行脚本操作，那么可以给他定义一个id，否则只能利用遍历页面元素加上指定特定属性来找到它，这是相对浪费时间资源，远远不如一个id来得简单。
+15. li中内容超过长度后以省略号显示的方法 （此方法适用与IE与OP浏览器）
+<style type="text/css">
+<!-- li { width:200px; white-space:nowrap; text-overflow:ellipsis; -o-text-overflow:ellipsis; overflow: hidden; } -->
+</style>
+16. 为什么web标准中IE无法设置滚动条颜色了
+解决办法是将body换成html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "网址">
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<style type="text/css">
+<!-- html { scrollbar-face-color:#f6f6f6; scrollbar-highlight-color:#fff; scrollbar-shadow-color:#eeeeee; scrollbar-3dlight-color:#eeeeee; scrollbar-arrow-color:#000; scrollbar-track-color:#fff; scrollbar-darkshadow-color:#fff; } -->
+</style>
+17. 为什么无法定义1px左右高度的容器
+IE6下这个问题是因为默认的行高造成的。解决的方法也有很多，例如:overflow:hidden | zoom:0.08 | line-height:1px 。
+18. 怎么样才能让层显示在Flash之上呢
+解决的办法是给Flash设置透明 <param name="wmode" value="transparent" />
+19. 怎样使一个层垂直居中于浏览器中
+这里我们使用百分比绝对定位，与外补丁负值的方法，负值的大小为其自身宽度高度除以二 。
+<style type="text/css">
+<!-- div { position:absolute; top:50%; left:50%; margin:-100px 0 0 -100px; width:200px; height:200px; border:1px solid red; } -->
+</style>

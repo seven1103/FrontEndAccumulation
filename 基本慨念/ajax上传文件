@@ -1,0 +1,16 @@
+ajax上传文件的工作原理
+
+用到两个对象
+FormData XMLHttpRequest
+
+列子：
+var form = new FormData();
+form.append('file',fileobj);
+
+var xhr = new XMLHttpRequest();
+xhr.open('post',FileController,true);
+xhr.onoad = function(){
+    alert('上传成功')
+}
+
+xhr.send(form);
